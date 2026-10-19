@@ -57,44 +57,82 @@ Normally, capturing these moments requires stopping your conversation, pulling o
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture: Bee Wearable & Apple Watch Integration
+
+**Busy Bee** was architected specifically to integrate directly with both the **Bee Wearable (Pioneer pendant)** and the **Apple Watch running Bee software**.
+
+Here is an exact breakdown of how the integration works mechanically, how the data flows from your wrist to AWS Bedrock, and why it provides a frictionless experience for both everyday users and hackathon judges:
+
+### 1. How It Connects to Real Bee & Apple Watch Hardware
+
+The Bee wearable and the Apple Watch Bee companion app record ambient speech, perform on-device/local speaker diarization, and expose conversations through three standard interfaces that `server/beeConnector.js` actively bridges:
 
 ```
-                       ┌────────────────────────────────┐
-                       │   Bee Wearable / Apple Watch   │
-                       │   (Live Ambient Audio Stream)  │
-                       └───────────────┬────────────────┘
-                                       │
-                      bee now --json   │   Web Speech API / Mic
-                      bee sync / proxy │
-                                       ▼
-                       ┌────────────────────────────────┐
-                       │      Busy Bee Node Server      │
-                       │     (Express + SSE Bridge)     │
-                       └───────────────┬────────────────┘
-                                       │
-            Bedrock Converse API       │   Structured JSON Schema
-            (anthropic.claude-3-5 /    │   Prompt Engineering
-             amazon.nova-pro / titan)  │
-                                       ▼
-                       ┌────────────────────────────────┐
-                       │        AWS Bedrock Engine      │
-                       │  • Detects Meeting Intent      │
-                       │  • Detects Amazon Buy Intent   │
-                       │  • Detects Tasks & Deadlines   │
-                       └───────────────┬────────────────┘
-                                       │
-                         Real-Time SSE │ Push Event
-                                       ▼
-                       ┌────────────────────────────────┐
-                       │    Proactive Action Hub UI     │
-                       │       (React 18 + Tailwind)    │
-                       ├────────────────────────────────┤
-                       │  🛒 [Order on Amazon (1-Click)]│
-                       │  📅 [Google / Outlook / .ICS]  │
-                       │  📋 [Sync to Bee CLI Todos]    │
-                       └────────────────────────────────┘
+┌─────────────────────────────────┐
+│   Bee Wearable / Apple Watch    │
+│   (Continuous Ambient Audio)    │
+└───────────────┬─────────────────┘
+                │
+                ▼
+┌─────────────────────────────────┐
+│     Bee Companion Daemon        │
+│  • CLI: `bee now --json`        │
+│  • Local Proxy: /v1/* (port 3000│
+│  • MCP Spec: 2025-11-25         │
+└───────────────┬─────────────────┘
+                │
+                ▼
+┌─────────────────────────────────┐
+│      Busy Bee Node Server       │
+│  • Auto-detects Bee CLI / Proxy │
+│  • Polls & deduplicates turns   │
+│  • AWS Bedrock Converse API     │
+└───────────────┬─────────────────┘
+                │
+        ┌───────┴─────────────────┐
+        ▼                         ▼
+┌───────────────────────┐ ┌──────────────────────┐
+│  Companion Dashboard  │ │   Back to Wearable   │
+│  (Desktop / Mobile)   │ │  (Bee Todo List /    │
+│ • 1-Click Amazon Cart │ │   Apple Watch Screen)│
+│ • Google/Outlook/ICS  │ │ • `bee todo add`     │
+└───────────────────────┘ └──────────────────────┘
 ```
+
+#### Ambient Conversation Ingestion:
+* **Bee CLI Mode:** When you or people around you speak, the wearable records it. `beeConnector.js` executes `bee now --json` to ingest the latest conversation segment with timestamps and speaker diarization.
+* **Bee HTTP Proxy / MCP Mode:** If running the Bee proxy on `http://127.0.0.1:3000`, Busy Bee connects directly to `/v1/conversations` or the Streamable HTTP MCP endpoint (`mcp.json` spec `2025-11-25`).
+* **Turn Deduplication:** `beeConnector.js` tracks `seenConversationIds` in memory, ensuring duplicate transcripts are never processed twice.
+
+#### Bidirectional Sync (Wrist Feedback):
+It's not just read-only. When Busy Bee detects an ambient reminder (e.g., *"Remind me to submit the quarterly taxes before Friday"*), clicking or auto-dispatching the task triggers `beeConnector.addTodo()`:
+```javascript
+// Calls `bee todo add` or POST /v1/todos
+await beeConnector.addTodo("Submit the quarterly taxes before Friday");
+```
+**Result:** The task appears directly inside your Bee wearable’s memory log and on the **Apple Watch Bee todo screen**!
+
+### 2. Form Factor Architecture (Wearable + Companion UI)
+
+Wearables like the Bee pendant have no screen, and the Apple Watch has a 1.9-inch screen. You cannot comfortably review a multi-item grocery bundle, adjust subscription quantities, or inspect a complex calendar conflict on a watch face.
+
+Busy Bee solves this using the official wearable companion paradigm:
+* **The Wearable (Bee / Apple Watch):** Operates completely hands-free in the background, listening to ambient conversation and receiving synced alerts.
+* **The Companion Hub (`http://localhost:5173`):** Runs on your laptop, desktop, or phone browser as the proactive action center, presenting rich 1-Click Amazon Prime restock cards, Google/Outlook calendar scheduling buttons, and `.ics` file downloads.
+
+### 3. Graceful Fallback for Hackathon Judges (No Device Required)
+
+Under the Devpost Hackathon rules:
+> *"A physical device is not required. Your demo needs to show your project actually using that data to do something useful for a person."*
+
+Judges reviewing your project will likely be evaluating dozens of submissions from their laptops and may not have a physical Bee pendant or Apple Watch on hand. Busy Bee handles this seamlessly:
+* **Live Microphone Web Speech API:** Judges can click **"Live Mic"** in the UI and speak directly into their laptop microphone (e.g. *"We are out of organic eggs and coffee"*).
+* **One-Click Scenario Buttons:** Instant test buttons for Milk/Eggs, 3 PM Meeting, AA Batteries, and Taxes.
+* **Automated "Play Demo Tour":** A single click clears the canvas and auto-plays a real-time conversational scenario with live Bedrock parsing and dynamic price calculations.
+
+#### Hardware Execution Summary:
+* **With real Bee / Apple Watch hardware:** Simply run `npm install -g @beeai/cli && bee login`. Busy Bee will immediately detect the device, ingest ambient dialogue, and sync todos back to your wrist.
+* **Without hardware (Judges / Testing):** The application runs 100% of its features using the live microphone, speech synthesis, and deterministic/Bedrock extraction pipelines.
 
 ---
 
