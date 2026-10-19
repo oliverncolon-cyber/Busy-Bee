@@ -1,0 +1,23 @@
+{
+  "mcpVersion": "2025-11-25",
+  "servers": {
+    "bee-wearable": {
+      "command": "npx",
+      "args": ["-y", "@beeai/cli", "mcp"],
+      "env": {
+        "BEE_PROXY_URL": "http://127.0.0.1:3000"
+      },
+      "transport": {
+        "type": "streamable-http",
+        "endpoint": "http://127.0.0.1:3000/mcp"
+      },
+      "capabilities": [
+        "conversations.read",
+        "todos.read",
+        "todos.write",
+        "facts.read",
+        "today.brief"
+      ]
+    }
+  }
+}
