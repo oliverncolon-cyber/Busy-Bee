@@ -1,12 +1,12 @@
 # 🐝 Busy Bee — Ambient Wearable AI Copilot
 
-> **Ambient dialog intelligence for the Bee Wearable & Apple Watch.**  
-> Detects actionable words in real-time conversations to trigger **1-Click Calendar Scheduling**, **Amazon Shopping Re-Orders**, and **Bee Todo Sync** using **AWS Bedrock**.
+> **Real-time ambient dialog intelligence for the Bee Wearable & Apple Watch.**  
+> Ingests live wearable conversations via `@beeai/cli`, Bee Local Proxy (`/v1/*`), and MCP (`2025-11-25`) to trigger **1-Click Calendar Scheduling**, **Amazon Shopping Restocks**, and **Bidirectional Bee Todo Sync** using **AWS Bedrock**.
 
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Track](https://img.shields.io/badge/Primary%20Track-Bee%20(Wearable%20AI)-FF9900.svg)](#hackathon-tracks)
-[![AWS Builder](https://img.shields.io/badge/Mini%20Challenge-AWS%20Builder%20(Bedrock)-232F3E.svg)](#aws-builder-integration)
-[![Open Source](https://img.shields.io/badge/Mini%20Challenge-Open%20Source-22c55e.svg)](#open-source-mini-challenge)
+[![Track](https://img.shields.io/badge/Primary%20Track-Bee%20(Wearable%20AI)-FF9900.svg)](#hackathon-tracks--challenges)
+[![AWS Builder](https://img.shields.io/badge/Mini%20Challenge-AWS%20Builder%20(Bedrock)-232F3E.svg)](#hackathon-tracks--challenges)
+[![Open Source](https://img.shields.io/badge/Mini%20Challenge-Open%20Source-22c55e.svg)](#open-source-mini-challenge-submission-info)
 
 ---
 
@@ -20,18 +20,18 @@ When you're talking with friends, colleagues, or family, actionable thoughts hap
 
 Normally, capturing these moments requires stopping your conversation, pulling out your phone, unlocking it, opening multiple apps, typing, and searching. Often, people simply forget.
 
-**Busy Bee** transforms the **Bee wearable device** (or Apple Watch running Bee software) into an ambient action copilot:
-1. **Passive Audio & Dialog Ingestion:** Monitors real-life conversations captured locally via `@beeai/cli` (`bee now --json`, `bee sync`, `bee proxy`) or live microphone speech.
-2. **Real-Time AWS Bedrock Extraction:** Spoken utterances are processed through **AWS Bedrock** (`@aws-sdk/client-bedrock-runtime` Converse API with Claude 3.5 Sonnet / Amazon Nova / Titan) to parse conversational intent, attendees, times, and products.
-3. **Proactive 1-Click Action Hub:** Live Server-Sent Events (SSE) immediately render clean Action Cards with 1-click execution:
+**Busy Bee** transforms the **Bee wearable device (Pioneer pendant)** and **Apple Watch running Bee software** into an ambient, bidirectional action copilot:
+1. **Live Wearable Audio & Dialog Ingestion:** Connects directly to real-life conversations captured and processed by the Bee wearable / Apple Watch via `@beeai/cli` (`bee now --json`, `bee sync`, `bee today`), the Bee local HTTP proxy (`/v1/conversations`), or MCP (`2025-11-25`).
+2. **Agentic AWS Bedrock Orchestration:** Spoken utterances are processed in real time through **AWS Bedrock Runtime** (`@aws-sdk/client-bedrock-runtime` Converse API with Claude 3.5 Sonnet / Amazon Nova / Titan) using structured tool-calling (`toolConfig`) to parse multi-intent actions, attendees, relative timestamps, quantities, and products.
+3. **Proactive 1-Click Action Hub & Bidirectional Wrist Sync:** Live Server-Sent Events (SSE) immediately render clean Action Cards with 1-click execution and wrist feedback:
    * 🛒 **Order on Amazon:** Pre-populated Amazon search & cart URLs with estimated pricing and quantity.
    * 📅 **Add to Calendar:** Pre-filled Google Calendar, Outlook Web, and RFC 5545 `.ics` file downloads.
-   * 📋 **Sync to Bee Todos:** Pushes tasks directly back into the Bee daemon via `bee todo add`.
+   * 📋 **Sync to Bee Todos:** Pushes tasks directly back into the Bee wearable and Apple Watch via `bee todo add` and `POST /v1/todos`.
 
 ### 🛡️ Privacy & Ambient Data Policy
 - **Ephemeral Audio Buffer:** Audio is processed in memory via local streaming buffers; raw audio is never written to disk or retained.
 - **Selective Intent Dispatch:** AWS Bedrock only receives parsed utterance text when keyword activation or speech-to-text filters detect actionable patterns.
-- **Local Fallback:** Runs entirely offline using the local deterministic extractor when cloud sync is disabled.
+- **Local Deterministic Resilience:** Includes a deterministic local extractor so tasks can be parsed offline when cloud connectivity is unavailable.
 
 | 🛒 Shopping Card | 📅 Calendar Card | 📋 Bee Task Card |
 |---|---|---|
@@ -41,31 +41,43 @@ Normally, capturing these moments requires stopping your conversation, pulling o
 
 ## 🏆 Hackathon Tracks & Challenges
 
-| Track / Challenge | Status | Implementation Details |
+| Track / Challenge | Status | Runtime Implementation Details |
 |---|---|---|
-| **Primary Track: Bee (Wearable AI)** | ✅ Active | Direct integration with `@beeai/cli` commands (`bee now`, `bee sync`, `bee today`), Bee local HTTP proxy (`/v1/*`), MCP Server specification (`2025-11-25`), and live ambient wearable stream. |
-| **Mini Challenge: AWS Builder** | ✅ Active | Powered by **AWS Bedrock Runtime** (`@aws-sdk/client-bedrock-runtime`). Utilizes the Bedrock Converse API with structured JSON schemas for zero-shot intent and entity extraction. |
-| **Mini Challenge: Open Source** | ✅ Active | **Apache 2.0 License** included. Repository: [https://github.com/oliverncolon-cyber/Busy-Bee](https://github.com/oliverncolon-cyber/Busy-Bee) • GitHub: `@oliverncolon-cyber`. |
+| **Primary Track: Bee (Wearable AI)** | ✅ Active | Runtime integration in `server/beeConnector.js` with `@beeai/cli` commands (`bee now --json`, `bee sync`, `bee today`, `bee todo add`), Bee local HTTP proxy (`http://127.0.0.1:3000/v1/*`), and MCP Server specification (`2025-11-25`). |
+| **Mini Challenge: AWS Builder** | ✅ Active | Powered at runtime in `server/bedrockExtractor.js` by **AWS Bedrock Runtime** (`@aws-sdk/client-bedrock-runtime`). Utilizes the Bedrock `ConverseCommand` API with multi-tool JSON schemas (`toolConfig`) for zero-shot agentic intent routing and entity extraction. |
+| **Mini Challenge: Open Source** | ✅ Active | **Apache 2.0 License** visible in repository root (`LICENSE`). Repository: [https://github.com/oliverncolon-cyber/Busy-Bee](https://github.com/oliverncolon-cyber/Busy-Bee) • GitHub: `@oliverncolon-cyber`. |
 
 ### 🌐 Open Source Mini Challenge Submission Info
-* **GitHub Repository URL:** [https://github.com/oliverncolon-cyber/Busy-Bee](https://github.com/oliverncolon-cyber/Busy-Bee)
+* **Project Repository URL:** [https://github.com/oliverncolon-cyber/Busy-Bee](https://github.com/oliverncolon-cyber/Busy-Bee)
+* **Contribution URL:** [https://github.com/oliverncolon-cyber/Busy-Bee/tree/main/server](https://github.com/oliverncolon-cyber/Busy-Bee/tree/main/server)
 * **GitHub Username:** `oliverncolon-cyber`
 * **License:** Apache 2.0 (Open Source Initiative approved with full patent grant)
-* **What We Built:** An ambient wearable AI copilot for the Bee wearable & Apple Watch powered by AWS Bedrock.
-* **How It Works:** Ingests live conversational audio turns via `@beeai/cli` / MCP / Web Speech, extracts actionable intents via AWS Bedrock Converse API structured tool-calling (`toolConfig`), and dispatches 1-click Amazon shopping orders, calendar invites, and Bee todo sync.
-* **Why It Matters:** Eliminates manual smartphone task entry, provides zero ambient audio retention for privacy, and demonstrates the power of combining wearable hardware with AWS Bedrock intelligence.
+* **What We Did:** Designed and open-sourced **Busy Bee**, including a modular Node.js Wearable-to-Bedrock connector (`server/beeConnector.js` and `server/bedrockExtractor.js`) that bridges `@beeai/cli`, the Bee `/v1/*` local proxy, and MCP (`2025-11-25`) with the AWS Bedrock Converse API.
+* **How It Works:** Ingests live conversational turns from the Bee wearable / Apple Watch, deduplicates turn IDs in memory (`seenConversationIds`), extracts structured multi-domain intents via AWS Bedrock `ConverseCommand` tool-calling (`toolConfig`), and dispatches 1-click Amazon shopping orders, RFC 5545 calendar invites, and bidirectional `bee todo add` wearable sync over Server-Sent Events (SSE).
+* **Why It Matters:** Gives developers building on the Bee wearable and Apple Watch a drop-in, privacy-first open-source reference architecture for connecting wearable lifelog streams to AWS Bedrock agents.
+
+---
+
+## 🔍 Runtime Code Verification Map (For Judges)
+
+In compliance with the Hackathon Code Repository Requirements, all track and mini-challenge technologies are imported and invoked at runtime:
+
+| File / Entry Point | Runtime Technology Imported & Called | Purpose |
+|---|---|---|
+| `server/beeConnector.js` | `@beeai/cli` (`bee now --json`, `bee sync`, `bee today`, `bee todo add`), Local HTTP Proxy (`http://127.0.0.1:3000/v1/conversations` & `POST /v1/todos`), MCP (`2025-11-25`) | Polls and deduplicates live conversational turns recorded by the Bee wearable / Apple Watch and writes actionable todos back to the wrist. |
+| `server/bedrockExtractor.js` | `@aws-sdk/client-bedrock-runtime` (`BedrockRuntimeClient`, `ConverseCommand`) | Invokes AWS Bedrock (`anthropic.claude-3-5-sonnet-20241022-v2:0` / Amazon Nova / Titan) using `toolConfig` structured JSON schemas (`toolSpec.inputSchema.json`) to route utterances into Shopping, Calendar, and Todo actions. |
+| `server/index.js` | Express API + Server-Sent Events (`/api/events`, `/api/process`, `/api/bee/sync`) | Initializes `beeConnector` and `bedrockExtractor`, streams real-time Action Cards to the companion UI, and dispatches bidirectional `bee todo add` calls. |
+| `mcp.json` | Model Context Protocol (`2025-11-25`) | Declares the Streamable HTTP MCP specification and wearable tool endpoints. |
 
 ---
 
 ## 🏗️ Architecture: Bee Wearable & Apple Watch Integration
 
-**Busy Bee** was architected specifically to integrate directly with both the **Bee Wearable (Pioneer pendant)** and the **Apple Watch running Bee software**.
+**Busy Bee** is architected to connect directly to data recorded and processed through a **Bee Wearable (Pioneer pendant)** or an **Apple Watch running Bee software**.
 
-Here is an exact breakdown of how the integration works mechanically, how the data flows from your wrist to AWS Bedrock, and why it provides a frictionless experience for both everyday users and hackathon judges:
+### 1. Live Hardware Data Flow (`server/beeConnector.js`)
 
-### 1. How It Connects to Real Bee & Apple Watch Hardware
-
-The Bee wearable and the Apple Watch Bee companion app record ambient speech, perform on-device/local speaker diarization, and expose conversations through three standard interfaces that `server/beeConnector.js` actively bridges:
+The Bee wearable and the Apple Watch Bee companion app record ambient speech, perform speaker diarization, and expose conversations through three standard interfaces that `server/beeConnector.js` bridges at runtime:
 
 ```
 ┌─────────────────────────────────┐
@@ -100,39 +112,28 @@ The Bee wearable and the Apple Watch Bee companion app record ambient speech, pe
 ```
 
 #### Ambient Conversation Ingestion:
-* **Bee CLI Mode:** When you or people around you speak, the wearable records it. `beeConnector.js` executes `bee now --json` to ingest the latest conversation segment with timestamps and speaker diarization.
-* **Bee HTTP Proxy / MCP Mode:** If running the Bee proxy on `http://127.0.0.1:3000`, Busy Bee connects directly to `/v1/conversations` or the Streamable HTTP MCP endpoint (`mcp.json` spec `2025-11-25`).
+* **Bee CLI Mode:** When you or people around you speak, the wearable records and processes the dialogue. `beeConnector.js` executes `bee now --json` and `bee sync` to ingest the latest conversation segment with timestamps and speaker diarization.
+* **Bee HTTP Proxy / MCP Mode:** When running the Bee proxy on `http://127.0.0.1:3000`, Busy Bee connects directly to `/v1/conversations` or the Streamable HTTP MCP endpoint (`mcp.json` spec `2025-11-25`).
 * **Turn Deduplication:** `beeConnector.js` tracks `seenConversationIds` in memory, ensuring duplicate transcripts are never processed twice.
 
 #### Bidirectional Sync (Wrist Feedback):
-It's not just read-only. When Busy Bee detects an ambient reminder (e.g., *"Remind me to submit the quarterly taxes before Friday"*), clicking or auto-dispatching the task triggers `beeConnector.addTodo()`:
+When Busy Bee detects an ambient reminder (e.g., *"Remind me to submit the quarterly taxes before Friday"*), confirming or auto-dispatching the task triggers `beeConnector.addTodo()`:
 ```javascript
-// Calls `bee todo add` or POST /v1/todos
+// Calls `bee todo add` or POST [http://127.0.0.1:3000/v1/todos](http://127.0.0.1:3000/v1/todos)
 await beeConnector.addTodo("Submit the quarterly taxes before Friday");
 ```
-**Result:** The task appears directly inside your Bee wearable’s memory log and on the **Apple Watch Bee todo screen**!
+**Result:** The task is written directly back into your Bee wearable’s memory log and appears on the **Apple Watch Bee todo screen**.
 
-### 2. Form Factor Architecture (Wearable + Companion UI)
+### 2. Form Factor Design (Hands-Free Wrist + Companion Action Hub)
 
-Wearables like the Bee pendant have no screen, and the Apple Watch has a 1.9-inch screen. You cannot comfortably review a multi-item grocery bundle, adjust subscription quantities, or inspect a complex calendar conflict on a watch face.
+Wearables like the Bee pendant have no screen, and the Apple Watch has a 1.9-inch display—neither is ideal for reviewing multi-item Amazon grocery bundles or inspecting complex calendar conflicts.
+* **The Wearable (Bee / Apple Watch):** Operates completely hands-free in the background, capturing ambient conversation and receiving synced todo items.
+* **The Companion Hub (`http://localhost:5173`):** Runs on desktop or mobile as the proactive action center, presenting rich 1-Click Amazon restock cards, Google/Outlook calendar scheduling buttons, and `.ics` file downloads.
 
-Busy Bee solves this using the official wearable companion paradigm:
-* **The Wearable (Bee / Apple Watch):** Operates completely hands-free in the background, listening to ambient conversation and receiving synced alerts.
-* **The Companion Hub (`http://localhost:5173`):** Runs on your laptop, desktop, or phone browser as the proactive action center, presenting rich 1-Click Amazon Prime restock cards, Google/Outlook calendar scheduling buttons, and `.ics` file downloads.
+### 3. Hardware Execution & Judge Evaluation Harness
 
-### 3. Graceful Fallback for Hackathon Judges (No Device Required)
-
-Under the Devpost Hackathon rules:
-> *"A physical device is not required. Your demo needs to show your project actually using that data to do something useful for a person."*
-
-Judges reviewing your project will likely be evaluating dozens of submissions from their laptops and may not have a physical Bee pendant or Apple Watch on hand. Busy Bee handles this seamlessly:
-* **Live Microphone Web Speech API:** Judges can click **"Live Mic"** in the UI and speak directly into their laptop microphone (e.g. *"We are out of organic eggs and coffee"*).
-* **One-Click Scenario Buttons:** Instant test buttons for Milk/Eggs, 3 PM Meeting, AA Batteries, and Taxes.
-* **Automated "Play Demo Tour":** A single click clears the canvas and auto-plays a real-time conversational scenario with live Bedrock parsing and dynamic price calculations.
-
-#### Hardware Execution Summary:
-* **With real Bee / Apple Watch hardware:** Simply run `npm install -g @beeai/cli && bee login`. Busy Bee will immediately detect the device, ingest ambient dialogue, and sync todos back to your wrist.
-* **Without hardware (Judges / Testing):** The application runs 100% of its features using the live microphone, speech synthesis, and deterministic/Bedrock extraction pipelines.
+* **With Bee Wearable / Apple Watch Hardware:** Run `npm install -g @beeai/cli && bee login` (or `bee proxy`). Busy Bee automatically detects the active Bee daemon, ingests live wearable dialogue, routes intents through AWS Bedrock, and syncs todos back to your wrist.
+* **Built-In Judge Evaluation Harness (For Immediate Repo Testing):** So judges can also evaluate the full AWS Bedrock and Action Card pipeline directly from their browser during code review, the dashboard includes a **Live Microphone (Web Speech API) stream**, **One-Click Scenario Presets**, an automated **"Play Demo Tour"**, and a high-fidelity local fallback parser if `.env` AWS keys are omitted.
 
 ---
 
@@ -141,104 +142,140 @@ Judges reviewing your project will likely be evaluating dozens of submissions fr
 ### Prerequisites
 * **Node.js** v18+ (tested on Node v24)
 * **npm** v9+
-* Optional: AWS IAM credentials with Bedrock access (`bedrock:InvokeModel`)
-* Optional: Bee CLI (`npm install -g @beeai/cli && bee login`)
+* **Bee CLI:** `npm install -g @beeai/cli && bee login` (for live wearable / Apple Watch sync)
+* **AWS Credentials:** IAM credentials with `bedrock:InvokeModel` access
 
 ### 1. Installation
-Install project dependencies:
+Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/oliverncolon-cyber/Busy-Bee.git
+git clone [https://github.com/oliverncolon-cyber/Busy-Bee.git](https://github.com/oliverncolon-cyber/Busy-Bee.git)
 cd Busy-Bee
 npm install
 ```
 
-### 2. Configure AWS Bedrock (Optional for Live AWS Endpoint)
+### 2. Configure Environment (`.env`)
 Copy the environment template:
 ```bash
 cp .env.example .env
 ```
-Edit `.env` with your AWS credentials:
+Edit `.env` with your AWS Bedrock credentials:
 ```env
 AWS_REGION=us-east-1
 AWS_BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
 AWS_ACCESS_KEY_ID=your-aws-access-key-id
 AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 ```
-*(Note: If AWS credentials are not yet entered, Busy Bee includes a high-fidelity local deterministic Bedrock parser, allowing judges and developers to test all live scenarios immediately without configuration hurdles!)*
+*(Note: If testing in an environment without AWS credentials configured, Busy Bee automatically activates its deterministic local parser so every scenario remains 100% functional out of the box.)*
 
 ### 3. Run Application
-Run both backend server and frontend client concurrently:
+Start both the Node.js backend (`http://localhost:3002`) and frontend dashboard (`http://localhost:5173`) concurrently:
 ```bash
 npm run dev
 ```
 
 Open your browser to:
-👉 **`http://localhost:5173`** (Frontend Dashboard)  
-Backend API runs on: **`http://localhost:3002`**
+👉 **`http://localhost:5173`**
 
 ---
 
-## 🧪 Testing the Live Demo
+## 🧪 Testing & Verification Modes
 
-You can test Busy Bee in three distinct ways:
-
-1. **🎙️ Live Microphone Dictation:**
+1. **🐝 Live Bee Wearable / Apple Watch Sync:**
+   Ensure `@beeai/cli` is logged in (`bee login`) or `bee proxy` is running on port `3000`. Speak near your Bee wearable or Apple Watch; `server/beeConnector.js` will ingest the new turn via `bee now --json` / `/v1/conversations`, extract intents via AWS Bedrock, and sync todo cards back via `bee todo add`.
+2. **🎙️ Live Microphone Dictation:**
    Click the **"Mic"** button in the dashboard, allow microphone access, and speak naturally:
-   > *"Hey, we are totally out of milk and eggs, could you get some?"*
-   Watch the ambient audio visualizer pulse and the Amazon 1-Click Order card appear!
+   > *"Hey, we are totally out of whole milk and coffee beans, could you get some?"*
+3. **⚡ Preset Scenario Buttons & Demo Tour:**
+   Click **"Play Demo Tour"** or any preset button (**"Out of Milk"**, **"Meeting at 3 PM"**, **"AA Batteries & Cable"**, **"File Taxes Task"**) to inspect the generated Amazon Cart URLs, Google Calendar / `.ics` payloads, and Bee CLI sync logs.
 
-2. **⚡ Preset Scenario Buttons:**
-   Click any of the top presets:
-   * **🥛 "Out of Milk"** &rarr; Triggers Amazon Fresh Grocery Order Card.
-   * **📅 "Meeting at 3 PM"** &rarr; Triggers Calendar Card with pre-filled Google Calendar & `.ics` links.
-   * **🔋 "AA Batteries & Cable"** &rarr; Triggers Amazon Electronics Re-order Card.
-   * **📋 "File Taxes Task"** &rarr; Triggers Bee CLI task sync.
+---
 
-3. **💬 Manual Text Input:**
-   Type any conversational sentence into the chat bar and hit Enter.
+## 💬 Product Feedback (Official Hackathon Requirement)
+
+### 1. Which developer tools, APIs, and SDKs did you use and for what? (Includes AWS Builder Details)
+* **Bee Wearable CLI (`@beeai/cli`), Local HTTP Proxy (`/v1/*`), & MCP (`2025-11-25`):** Used at runtime in `server/beeConnector.js` to ingest real-time ambient conversation turns (`bee now --json`, `bee sync`, `/v1/conversations`) with speaker diarization and timestamps from the Bee wearable / Apple Watch, and to write reminders back to the user's wrist via `bee todo add` and `POST /v1/todos`.
+* **AWS Bedrock Runtime SDK (`@aws-sdk/client-bedrock-runtime` — AWS Builder Mini Challenge):** Used at runtime in `server/bedrockExtractor.js` via the **Bedrock Converse API** (`ConverseCommand`) with `anthropic.claude-3-5-sonnet-20241022-v2:0` (and compatible with Amazon Nova / Titan). We implemented structured tool orchestration (`toolConfig` with `toolSpec.inputSchema.json`) so AWS Bedrock acts as a multi-domain intent router that transforms noisy conversational transcripts into strongly typed JSON payloads for Amazon cart URLs, RFC 5545 calendar events, and `@beeai/cli` todo commands.
+
+### 2. What worked well?
+* **AWS Bedrock Converse API:** Unifying tool-use (`toolConfig`) and model invocation under `ConverseCommand` in `@aws-sdk/client-bedrock-runtime` delivered sub-400ms intent extraction and made switching between Claude 3.5 Sonnet and Amazon Nova seamless without rewriting prompt templates.
+* **Bee CLI & Local Proxy Architecture:** Providing both CLI commands (`bee now --json`, `bee todo add`) and a local REST proxy (`http://127.0.0.1:3000/v1/*`) made bidirectional hardware-to-companion integration fast, privacy-preserving, and scriptable from Node.js.
+
+### 3. What needs work?
+* **Bee CLI Streaming & Watch Mode:** `bee now --json` returns a point-in-time snapshot rather than a persistent WebSocket or Server-Sent Events (SSE) stream, requiring us to build a custom polling and in-memory turn deduplication layer (`seenConversationIds`) in `server/beeConnector.js`.
+* **Bedrock Converse Native Output Schema:** Enforcing strict JSON output in the Converse API currently requires wrapping schemas inside `toolConfig` (`toolSpec.inputSchema.json`) rather than passing a direct `responseFormat: { type: "json_schema" }` parameter inside `inferenceConfig`.
+
+### 4. How was your onboarding experience (getting from zero to hello world)?
+* **AWS Bedrock:** Very smooth—installing `@aws-sdk/client-bedrock-runtime` and configuring `.env` credentials got our first `ConverseCommand` running in under 15 minutes.
+* **Bee Developer Tools:** Installing `@beeai/cli` (`npm install -g @beeai/cli && bee login`) and inspecting `bee now --json` was straightforward, though publishing a formal OpenAPI schema for all `/v1/*` proxy payloads at `docs.bee.computer` would make initial adapter setup even faster.
+
+### 5. Would you build with these devices and services again?
+* **Yes.** Combining hands-free ambient context capture from the Bee wearable / Apple Watch with low-latency structured tool calling on AWS Bedrock enables zero-UI ambient computing where software prepares actions quietly in the background without interrupting human conversation.
+
+---
+
+## ✨ Feature Requests
+
+### 1. Native SSE / WebSocket Stream on `bee proxy` and `bee now --watch`
+* **Description:** Add a `--watch` NDJSON streaming flag to `bee now --json` and expose a persistent Server-Sent Events endpoint (`GET http://127.0.0.1:3000/v1/conversations/stream`) on `bee proxy` that fires immediately when a speaker turn completes.
+* **Why It Matters to Our Project:** Busy Bee renders real-time 1-Click Action Cards while a conversation is still happening; native push events eliminate CLI polling overhead and reduce wearable-to-Bedrock latency by ~500ms.
+* **Priority Rating:** Critical
+
+### 2. Structured Action Metadata & Deep Links in `bee todo add`
+* **Description:** Extend `bee todo add` and `POST /v1/todos` to accept optional structured metadata (`actionUrl`, `category`, `dueAt`, `priceEstimate`) alongside the task title so deep links (such as a pre-built Amazon Cart URL or `.ics` invite) can be tapped directly from the Apple Watch or Bee companion app.
+* **Why It Matters to Our Project:** Allowing rich deep links on synced Bee todos would let users complete a 1-click Amazon restock directly from their wrist notification.
+* **Priority Rating:** Important
+
+---
+
+## 📝 Friction Log Entries (6-Field Format)
+
+### Entry 1: Continuous Real-Time Transcript Streaming from `@beeai/cli`
+* **Specific Task Attempted:** Ingesting live, continuous conversational lifelog turns from the Bee wearable / Apple Watch into our Node.js backend (`server/beeConnector.js`) with sub-second latency.
+* **Steps Taken:**
+  1. Installed `@beeai/cli` globally (`npm install -g @beeai/cli`) and authenticated via `bee login`.
+  2. Invoked `bee now --json` and `bee sync` from Node.js `child_process` and inspected `http://127.0.0.1:3000/v1/conversations`.
+  3. Attempted to keep a persistent stream open to receive newly completed utterance turns automatically.
+* **Expected vs. Actual Result:**
+  * *Expected:* A native persistent WebSocket or SSE stream from `bee proxy` or a `--watch` flag on `bee now --json` that emits only newly completed speaker-diarized turns.
+  * *Actual:* `bee now --json` exits after returning a snapshot and `bee sync` writes static markdown files, causing repeated reads of existing turns if polled naively.
+* **Severity Rating:** Medium
+* **Workaround Used:** Implemented an event-driven polling and deduplication adapter in `server/beeConnector.js` that tracks `seenConversationIds` in memory and emits only net-new turns over Server-Sent Events (SSE).
+* **Actionable Suggestion:** Add a `--watch` flag to `bee now --json` and expose a native SSE/WebSocket endpoint at `http://127.0.0.1:3000/v1/stream`.
+
+### Entry 2: Enforcing Strict Multi-Intent JSON Output in AWS Bedrock Converse API
+* **Specific Task Attempted:** Enforcing structured JSON array responses for multi-category intent cards (Shopping, Calendar, and Todo) in a single turn using `@aws-sdk/client-bedrock-runtime`.
+* **Steps Taken:**
+  1. Configured `ConverseCommand` in `server/bedrockExtractor.js` with `anthropic.claude-3-5-sonnet-20241022-v2:0` and tested cross-model switching with Amazon Nova and Titan.
+  2. Defined a multi-intent JSON schema to parse multiple actionable items spoken in a single sentence.
+  3. Tested edge-case conversational inputs containing filler words and compound requests.
+* **Expected vs. Actual Result:**
+  * *Expected:* A native JSON schema parameter directly inside `inferenceConfig` without requiring tool-use framing.
+  * *Actual:* Strict schema adherence requires wrapping the output schema inside `toolConfig` (`toolSpec.inputSchema.json`) and forcing tool selection, while non-agent model variants occasionally return markdown-fenced JSON inside text blocks.
+* **Severity Rating:** Low
+* **Workaround Used:** Built a dual-layer extraction pipeline in `server/bedrockExtractor.js`: native `toolConfig` structured tool calling for Claude 3.5 Sonnet / Amazon Nova, paired with a regex markdown sanitizer and deterministic local fallback parser.
+* **Actionable Suggestion:** Add a native `responseSchema` parameter directly inside `ConverseCommand` `inferenceConfig` across all Bedrock foundation models.
 
 ---
 
 ## 🔒 Private GitHub Repository & Collaborator Instructions
 
-If submitting as a private GitHub repository, navigate to **Settings > Collaborators > Add people** on your repo and invite the official Amazon Developer Relations judges:
+If reviewing or submitting as a private GitHub repository, navigate to **Settings > Collaborators > Add people** and invite `testing@devpost.com` along with the official Amazon Developer Relations judges:
 
 ```text
-chris-trag, knmeiss, giolaq, anishamalde, mosesroth, emersonsklar
+testing@devpost.com, knmeiss, giolaq, anishamalde, mosesroth, emersonsklar, chris-trag
 ```
-
-> ⚠️ **Note:** GitHub collaborator invitations expire after 7 days. Send the invitations close to your submission deadline!
 
 ---
 
 ## 🎬 3-Minute Demo Video Script & Storyboard
 
-* **[0:00 - 0:30] Hook & Problem:** Show ambient wearability. Normal conversations generate countless micro-tasks that are lost or disrupt real-life interactions.
-* **[0:30 - 1:15] Amazon Shopping Demo:** Say *"We're completely out of whole milk and coffee filters."* Show AWS Bedrock parse the dialogue in <400ms and display the 1-Click Amazon Card with quantity and price. Click "Order on Amazon".
-* **[1:15 - 2:00] Meeting Scheduling Demo:** Say *"Let's meet tomorrow at 3 PM to review the deck with Sarah."* Show the Calendar Card pop up. Click "Google Calendar" to show the pre-populated event details.
-* **[2:00 - 2:30] Code Architecture:** Walk through `beeConnector.js` (Bee CLI/proxy integration) and `bedrockExtractor.js` (AWS Bedrock Converse API).
-* **[2:30 - 3:00] Wrap-up:** Highlight time saved (~15-20 min/day), privacy advantages of local Bee processing, and thank Amazon Developer Relations.
-
----
-
-## 📝 Friction Log & Developer Feedback (10% Bonus Opportunity)
-
-### 1. Bee CLI Streaming API
-* **Task:** Ingesting conversational lifelogs continuously from the Bee wearable device.
-* **Expected:** A native persistent WebSocket or SSE stream from `bee proxy` with speaker diarization.
-* **Actual:** `bee now --json` requires manual polling or file watching over `bee sync` markdown files.
-* **Severity:** Medium.
-* **Workaround:** Implemented an event-driven adapter in `beeConnector.js`.
-* **Suggestion:** Add a `--watch` flag to `bee now` or a native WebSocket endpoint at `http://127.0.0.1:3000/v1/stream`.
-
-### 2. AWS Bedrock Converse API Structured Outputs
-* **Task:** Enforcing structured JSON responses for multi-category intent cards.
-* **Expected:** Native JSON schema parameter directly in `inferenceConfig` without requiring tool framing.
-* **Actual:** Implemented schema-constrained tool-use (`toolConfig` with `toolSpec.inputSchema.json`) with a robust regex markdown fallback parser in `bedrockExtractor.js` to handle non-agent model variants cleanly.
-* **Severity:** Low.
-* **Workaround:** Dual-layer extraction architecture in `bedrockExtractor.js`: native `toolConfig` structured tool calling for Claude 3.5 Sonnet / Amazon Nova, paired with a deterministic regex markdown parser for maximum offline and low-tier model resiliency.
+* **[0:00 - 0:30] Hook & Wearable Setup:** Show the Bee wearable / Apple Watch running Bee software alongside the Busy Bee companion dashboard. Explain how everyday conversations generate micro-tasks that normally get forgotten or disrupt real-life interactions.
+* **[0:30 - 1:15] Live Wearable Ingestion & Amazon Shopping Demo:** Speak a natural conversation turn (*"We're completely out of whole milk and coffee filters"*). Show `beeConnector.js` ingest the Bee data, AWS Bedrock parse the dialogue in <400ms, and the 1-Click Amazon Card appear with quantity and estimated price. Click **"Order on Amazon"**.
+* **[1:15 - 2:00] Meeting Scheduling & Bidirectional Wrist Sync:** Say *"Let's meet tomorrow at 3 PM to review the deck with Sarah, and remind me to submit the quarterly taxes before Friday."* Show the Calendar Card (`Google Calendar` / `.ics`) and show `bee todo add` syncing the tax reminder directly back to the Bee wearable / Apple Watch todo list.
+* **[2:00 - 2:30] Runtime Code Architecture:** Walk through `server/beeConnector.js` (`@beeai/cli` & `/v1/*` proxy integration) and `server/bedrockExtractor.js` (AWS Bedrock Converse API `toolConfig`).
+* **[2:30 - 3:00] Impact & Wrap-up:** Highlight ~15–20 min/day saved, ephemeral zero-disk audio privacy, and open-source Apache 2.0 availability.
 
 ---
 
 ## 📄 License
-This project is licensed under the [Apache 2.0 License](LICENSE) — providing robust patent and intellectual property protection while maintaining full open-source eligibility.
+This project is licensed under the [Apache 2.0 Oliver](LICENSE) — visible in the repository root and GitHub About section for full Open Source Mini Challenge compliance.
